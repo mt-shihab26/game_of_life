@@ -6,7 +6,9 @@ use ratatui::crossterm::{
 };
 
 fn main() -> Result<()> {
-    let (width, height) = terminal::size()?;
+    let (cols, rows) = terminal::size()?;
+
+    let mut cells = vec![vec![0; cols as usize]; rows as usize];
 
     ratatui::run(|terminal| -> Result<()> {
         loop {
@@ -23,8 +25,8 @@ fn main() -> Result<()> {
             terminal.draw(|frame| {
                 let buf = frame.buffer_mut();
 
-                for x in 0..width {
-                    for y in 0..height {
+                for (x, row) in cells.iter().enumerate() {
+                    for (y, col) in row.iter().enumerate() {
                         if x * y % 10 == 0 {
                             if let Some(cell) = buf.cell_mut((x, y)) {
                                 cell.set_symbol("█");
