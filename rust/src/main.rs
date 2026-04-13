@@ -10,9 +10,28 @@ use std::{
 };
 
 fn main() -> io::Result<()> {
+    terminal::enable_raw_mode()?;
+
     let mut stdout = io::stdout();
+
+    stdout.execute(terminal::EnterAlternateScreen)?;
+    stdout.execute(cursor::Hide)?;
+
+    let res = run(&mut stdout);
+
+    stdout.execute(cursor::Show)?;
+    stdout.execute(terminal::LeaveAlternateScreen)?;
+
+    terminal::disable_raw_mode()?;
+
+    res
+}
+
+fn run(stdout: &mut io::Stdout) -> io::Result<()> {
+    let mut count = 0;
+
     loop {
-        stdout.execute(terminal::Clear(terminal::ClearType::All))?;
+        count += 1;
 
         if event::poll(Duration::from_millis(500))? {
             match event::read()? {
@@ -22,14 +41,16 @@ fn main() -> io::Result<()> {
                     }
                     _ => (),
                 },
-                Event::Resize(width, height) => println!("New size {}x{}", width, height),
                 _ => (),
             }
         }
 
+        stdout.queue(terminal::Clear(terminal::ClearType::All))?;
         stdout
             .queue(cursor::MoveTo(0, 0))?
-            .queue(style::PrintStyledContent("Hello World".magenta()))?;
+            .queue(style::PrintStyledContent(
+                format!("Hello World: {count}").magenta(),
+            ))?;
 
         stdout.flush()?;
     }
