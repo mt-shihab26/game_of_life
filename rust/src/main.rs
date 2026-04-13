@@ -28,13 +28,10 @@ fn main() -> io::Result<()> {
 }
 
 fn run(stdout: &mut io::Stdout) -> io::Result<()> {
-    let mut count = 0;
-
-    let frame_time = Duration::from_millis(16); // ~60 FPS
+    let frame_time = Duration::from_millis(16);
 
     loop {
         let frame_start = Instant::now();
-        count += 1;
 
         if event::poll(Duration::from_millis(0))? {
             match event::read()? {
@@ -45,13 +42,19 @@ fn run(stdout: &mut io::Stdout) -> io::Result<()> {
                 _ => {}
             }
         }
-
         stdout.queue(terminal::Clear(terminal::ClearType::All))?;
-        stdout
-            .queue(cursor::MoveTo(0, 0))?
-            .queue(style::PrintStyledContent(
-                format!("Hello World: {count}").magenta(),
-            ))?;
+
+        let (width, height) = terminal::size()?;
+
+        for i in 1..width {
+            for j in 1..height {
+                if i * j % 10 == 0 {
+                    stdout
+                        .queue(cursor::MoveTo(i, j))?
+                        .queue(style::PrintStyledContent(format!("█").magenta()))?;
+                }
+            }
+        }
 
         stdout.flush()?;
 
