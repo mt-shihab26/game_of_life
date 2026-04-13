@@ -6,7 +6,7 @@ use crossterm::{
 };
 use std::{
     io::{self, Write},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 fn main() -> io::Result<()> {
@@ -30,18 +30,19 @@ fn main() -> io::Result<()> {
 fn run(stdout: &mut io::Stdout) -> io::Result<()> {
     let mut count = 0;
 
+    let frame_time = Duration::from_millis(16); // ~60 FPS
+
     loop {
+        let frame_start = Instant::now();
         count += 1;
 
-        if event::poll(Duration::from_millis(500))? {
+        if event::poll(Duration::from_millis(0))? {
             match event::read()? {
                 Event::Key(event) => match event.code {
-                    event::KeyCode::Char('q') => {
-                        return Ok(());
-                    }
-                    _ => (),
+                    event::KeyCode::Char('q') => return Ok(()),
+                    _ => {}
                 },
-                _ => (),
+                _ => {}
             }
         }
 
@@ -53,5 +54,10 @@ fn run(stdout: &mut io::Stdout) -> io::Result<()> {
             ))?;
 
         stdout.flush()?;
+
+        let elapsed = frame_start.elapsed();
+        if elapsed < frame_time {
+            std::thread::sleep(frame_time - elapsed);
+        }
     }
 }
