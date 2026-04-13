@@ -8,7 +8,7 @@ use ratatui::crossterm::{
 fn main() -> Result<()> {
     let (cols, rows) = terminal::size()?;
 
-    let mut cells = vec![vec![0; cols as usize]; rows as usize];
+    let cells = vec![vec![0; cols as usize]; rows as usize];
 
     ratatui::run(|terminal| -> Result<()> {
         loop {
@@ -21,16 +21,14 @@ fn main() -> Result<()> {
                     _ => {}
                 }
             }
-
             terminal.draw(|frame| {
                 let buf = frame.buffer_mut();
 
-                for (x, row) in cells.iter().enumerate() {
-                    for (y, col) in row.iter().enumerate() {
-                        if x * y % 10 == 0 {
-                            if let Some(cell) = buf.cell_mut((x, y)) {
-                                cell.set_symbol("█");
-                            }
+                for (y, row) in cells.iter().enumerate() {
+                    for (x, &value) in row.iter().enumerate() {
+                        let symbol = if value == 0 { " " } else { "█" };
+                        if let Some(cell) = buf.cell_mut((x as u16, y as u16)) {
+                            cell.set_symbol(symbol);
                         }
                     }
                 }
