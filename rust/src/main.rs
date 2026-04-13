@@ -1,8 +1,13 @@
 use std::{io::Result, time::Duration};
 
-use ratatui::crossterm::event::{self, Event, KeyCode};
+use ratatui::crossterm::{
+    event::{self, Event, KeyCode},
+    terminal,
+};
 
 fn main() -> Result<()> {
+    let (width, height) = terminal::size()?;
+
     ratatui::run(|terminal| -> Result<()> {
         loop {
             if event::poll(Duration::from_millis(16))? {
@@ -16,11 +21,10 @@ fn main() -> Result<()> {
             }
 
             terminal.draw(|frame| {
-                let area = frame.area();
                 let buf = frame.buffer_mut();
 
-                for x in 0..area.width {
-                    for y in 0..area.height {
+                for x in 0..width {
+                    for y in 0..height {
                         if x * y % 10 == 0 {
                             if let Some(cell) = buf.cell_mut((x, y)) {
                                 cell.set_symbol("█");
