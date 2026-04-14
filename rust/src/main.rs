@@ -72,18 +72,11 @@ fn game_of_life(cells: &mut Vec<Vec<i32>>) {
                 + get(&cloned, x, y + 1)
                 + get(&cloned, x + 1, y + 1);
 
-            *value = match value {
-                0 => match live_neighbors {
-                    3 => 1,
-                    _ => 0,
-                },
-                1 => match live_neighbors {
-                    2 => 1,
-                    3 => 1,
-                    _ => 0,
-                },
+            *value = match (*value, live_neighbors) {
+                (1, 2) | (1, 3) => 1,
+                (0, 3) => 1,
                 _ => 0,
-            };
+            }
         }
     }
 }
