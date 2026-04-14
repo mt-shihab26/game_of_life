@@ -21,7 +21,7 @@ fn main() -> Result<()> {
 
             mem::swap(&mut current, &mut next);
 
-            if event::poll(Duration::from_millis(120))? {
+            if event::poll(Duration::from_millis(20))? {
                 match event::read()? {
                     Event::Key(e) => match e.code {
                         KeyCode::Char('q') => return Ok(()),
