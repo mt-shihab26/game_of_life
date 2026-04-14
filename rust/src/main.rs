@@ -14,7 +14,7 @@ fn main() -> Result<()> {
 
     ratatui::run(|terminal| -> Result<()> {
         loop {
-            game_of_life(&mut cells);
+            cells = game_of_life(&cells);
 
             if event::poll(Duration::from_millis(120))? {
                 match event::read()? {
@@ -51,22 +51,22 @@ fn set_start(cells: &mut Vec<Vec<i32>>) {
     }
 }
 
-fn game_of_life(cells: &mut Vec<Vec<i32>>) {
-    let cloned = cells.clone();
+fn game_of_life(cells: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut cloned = cells.clone();
 
-    for (y, row) in cells.iter_mut().enumerate() {
+    for (y, row) in cloned.iter_mut().enumerate() {
         for (x, value) in row.iter_mut().enumerate() {
             let x = x as isize;
             let y = y as isize;
 
-            let live_neighbors = get(&cloned, x - 1, y - 1)
-                + get(&cloned, x, y - 1)
-                + get(&cloned, x + 1, y - 1)
-                + get(&cloned, x - 1, y)
-                + get(&cloned, x + 1, y)
-                + get(&cloned, x - 1, y + 1)
-                + get(&cloned, x, y + 1)
-                + get(&cloned, x + 1, y + 1);
+            let live_neighbors = get(cells, x - 1, y - 1)
+                + get(cells, x, y - 1)
+                + get(cells, x + 1, y - 1)
+                + get(cells, x - 1, y)
+                + get(cells, x + 1, y)
+                + get(cells, x - 1, y + 1)
+                + get(cells, x, y + 1)
+                + get(cells, x + 1, y + 1);
 
             *value = match (*value, live_neighbors) {
                 (1, 2) | (1, 3) => 1,
@@ -75,6 +75,8 @@ fn game_of_life(cells: &mut Vec<Vec<i32>>) {
             }
         }
     }
+
+    cloned
 }
 
 fn get(cells: &Vec<Vec<i32>>, x: isize, y: isize) -> i32 {
