@@ -60,6 +60,9 @@ fn game_of_life(cells: &mut Vec<Vec<i32>>) {
 
     for (y, row) in cells.iter_mut().enumerate() {
         for (x, value) in row.iter_mut().enumerate() {
+            let x = x as isize;
+            let y = y as isize;
+
             let live_neighbors = get(&cloned, x - 1, y - 1)
                 + get(&cloned, x, y - 1)
                 + get(&cloned, x + 1, y - 1)
@@ -74,7 +77,14 @@ fn game_of_life(cells: &mut Vec<Vec<i32>>) {
     }
 }
 
-fn get(cells: &Vec<Vec<i32>>, x: usize, y: usize) -> i32 {
+fn get(cells: &Vec<Vec<i32>>, x: isize, y: isize) -> i32 {
+    if y < 0 || x < 0 {
+        return 0;
+    }
+
+    let y = y as usize;
+    let x = x as usize;
+
     match cells.get(y) {
         Some(row) => match row.get(x) {
             Some(value) => *value,
