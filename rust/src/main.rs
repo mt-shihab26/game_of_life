@@ -58,7 +58,7 @@ fn main() -> Result<()> {
 fn set_start(cells: &mut Vec<Vec<i32>>) {
     for row in cells.iter_mut() {
         for cell in row.iter_mut() {
-            *cell = if rand::random::<f32>() > 0.5 { 1 } else { 0 };
+            *cell = if rand::random::<f32>() > 0.51 { 1 } else { 0 };
         }
     }
 }
