@@ -16,7 +16,7 @@ fn main() -> Result<()> {
         loop {
             game_of_life(&mut cells);
 
-            if event::poll(Duration::from_millis(16))? {
+            if event::poll(Duration::from_millis(120))? {
                 match event::read()? {
                     Event::Key(e) => match e.code {
                         KeyCode::Char('q') => return Ok(()),
