@@ -1,5 +1,6 @@
 use std::{io::Result, mem, time::Duration};
 
+use game_of_life::FpsCounter;
 use ratatui::crossterm::{
     event::{self, Event, KeyCode},
     terminal,
@@ -7,6 +8,8 @@ use ratatui::crossterm::{
 
 fn main() -> Result<()> {
     ratatui::run(|terminal| -> Result<()> {
+        let mut fps = FpsCounter::new();
+
         let (cols, rows) = terminal::size()?;
 
         let mut cells = vec![vec![0; cols as usize]; rows as usize];
@@ -20,6 +23,8 @@ fn main() -> Result<()> {
             game_of_life(&current, &mut next);
 
             mem::swap(&mut current, &mut next);
+
+            fps.tick();
 
             if event::poll(Duration::from_millis(20))? {
                 match event::read()? {
@@ -41,6 +46,8 @@ fn main() -> Result<()> {
                         }
                     }
                 }
+
+                fps.render(buf);
             })?;
         }
     })?;
