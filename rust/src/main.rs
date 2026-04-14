@@ -1,4 +1,4 @@
-use std::{io::Result, time::Duration};
+use std::{io::Result, mem, time::Duration};
 
 use ratatui::crossterm::{
     event::{self, Event, KeyCode},
@@ -6,15 +6,20 @@ use ratatui::crossterm::{
 };
 
 fn main() -> Result<()> {
-    let (cols, rows) = terminal::size()?;
-
-    let mut cells = vec![vec![0; cols as usize]; rows as usize];
-
-    set_start(&mut cells);
-
     ratatui::run(|terminal| -> Result<()> {
+        let (cols, rows) = terminal::size()?;
+
+        let mut cells = vec![vec![0; cols as usize]; rows as usize];
+
+        set_start(&mut cells);
+
+        let mut current = cells;
+        let mut next = current.clone();
+
         loop {
-            cells = game_of_life(&cells);
+            game_of_life(&current, &mut next);
+
+            mem::swap(&mut current, &mut next);
 
             if event::poll(Duration::from_millis(120))? {
                 match event::read()? {
@@ -28,7 +33,7 @@ fn main() -> Result<()> {
             terminal.draw(|frame| {
                 let buf = frame.buffer_mut();
 
-                for (y, row) in cells.iter().enumerate() {
+                for (y, row) in current.iter().enumerate() {
                     for (x, &value) in row.iter().enumerate() {
                         let symbol = if value == 0 { " " } else { "█" };
                         if let Some(cell) = buf.cell_mut((x as u16, y as u16)) {
@@ -51,32 +56,30 @@ fn set_start(cells: &mut Vec<Vec<i32>>) {
     }
 }
 
-fn game_of_life(cells: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
-    let mut cloned = cells.clone();
-
-    for (y, row) in cloned.iter_mut().enumerate() {
+fn game_of_life(current: &Vec<Vec<i32>>, next: &mut Vec<Vec<i32>>) {
+    for (y, row) in next.iter_mut().enumerate() {
         for (x, value) in row.iter_mut().enumerate() {
             let x = x as isize;
             let y = y as isize;
 
-            let live_neighbors = get(cells, x - 1, y - 1)
-                + get(cells, x, y - 1)
-                + get(cells, x + 1, y - 1)
-                + get(cells, x - 1, y)
-                + get(cells, x + 1, y)
-                + get(cells, x - 1, y + 1)
-                + get(cells, x, y + 1)
-                + get(cells, x + 1, y + 1);
+            let live_neighbors = get(current, x - 1, y - 1)
+                + get(current, x, y - 1)
+                + get(current, x + 1, y - 1)
+                + get(current, x - 1, y)
+                + get(current, x + 1, y)
+                + get(current, x - 1, y + 1)
+                + get(current, x, y + 1)
+                + get(current, x + 1, y + 1);
 
-            *value = match (*value, live_neighbors) {
+            let cell = get(current, x, y);
+
+            *value = match (cell, live_neighbors) {
                 (1, 2) | (1, 3) => 1,
                 (0, 3) => 1,
                 _ => 0,
             }
         }
     }
-
-    cloned
 }
 
 fn get(cells: &Vec<Vec<i32>>, x: isize, y: isize) -> i32 {
