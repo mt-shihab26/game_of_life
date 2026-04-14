@@ -12,7 +12,7 @@ fn main() -> Result<()> {
 
         let (cols, rows) = terminal::size()?;
 
-        let mut cells = vec![vec![0; cols as usize]; rows as usize];
+        let mut cells = vec![vec![0 as u8; cols as usize]; rows as usize];
 
         set_start(&mut cells);
 
@@ -55,7 +55,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn set_start(cells: &mut Vec<Vec<i32>>) {
+fn set_start(cells: &mut Vec<Vec<u8>>) {
     for row in cells.iter_mut() {
         for cell in row.iter_mut() {
             *cell = if rand::random::<f32>() > 0.51 { 1 } else { 0 };
@@ -63,7 +63,7 @@ fn set_start(cells: &mut Vec<Vec<i32>>) {
     }
 }
 
-fn game_of_life(current: &Vec<Vec<i32>>, next: &mut Vec<Vec<i32>>) {
+fn game_of_life(current: &Vec<Vec<u8>>, next: &mut Vec<Vec<u8>>) {
     for (y, row) in next.iter_mut().enumerate() {
         for (x, value) in row.iter_mut().enumerate() {
             let x = x as isize;
@@ -89,7 +89,7 @@ fn game_of_life(current: &Vec<Vec<i32>>, next: &mut Vec<Vec<i32>>) {
     }
 }
 
-fn get(cells: &Vec<Vec<i32>>, x: isize, y: isize) -> i32 {
+fn get(cells: &Vec<Vec<u8>>, x: isize, y: isize) -> u8 {
     if y < 0 || x < 0 {
         return 0;
     }
