@@ -44,16 +44,12 @@ fn main() -> Result<()> {
 }
 
 fn set_start(cells: &mut Vec<Vec<i32>>) {
-    cells[1][2] = 1;
-    cells[2][0] = 1;
-    cells[2][2] = 1;
-    cells[3][1] = 1;
-    cells[3][2] = 1;
+    for row in cells.iter_mut() {
+        for cell in row.iter_mut() {
+            *cell = if rand::random::<f32>() > 0.5 { 1 } else { 0 };
+        }
+    }
 }
-
-//123
-//4x5
-//678
 
 fn game_of_life(cells: &mut Vec<Vec<i32>>) {
     let cloned = cells.clone();
